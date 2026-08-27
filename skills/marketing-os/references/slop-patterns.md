@@ -74,7 +74,7 @@ Every hedge is a small confession. Stack four and the reader stops believing any
 
 Read it out loud. Every time you stumble, stop, or hear yourself sounding like a press release, mark that sentence. This catches rhythm problems that no checklist does, and it is faster than working through the list above.
 
-Second test: **would a person say this to another person at a bar?** Not the register — the substance. If the substance would embarrass someone said out loud, it is not a claim, it is filler.
+Second test: **would a person say this to another person at a bar?** Not the register — the substance. If the substance would embarrass someone to say out loud, it is not a claim, it is filler.
 
 ---
 
