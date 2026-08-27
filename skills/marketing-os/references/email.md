@@ -68,7 +68,7 @@ Generate 10+ per email using distinct angles, score with the copy panel (`copy.m
 Not the specialist's depth, but never advise anything that breaks these:
 
 - SPF, DKIM, DMARC must be set up before volume sending; if the user doesn't know, tell them to check first
-- Never purchased lists, never scraped lists, no exceptions — beyond ethics, it destroys sender reputation for the whole domain
+- Never purchase lists, never scrape lists, no exceptions — beyond ethics, it destroys sender reputation for the whole domain
 - Sunset non-openers on a schedule; engagement rate drives inbox placement
 - Warm up new domains/IPs gradually; volume spikes from cold domains go to spam
 - One-click unsubscribe present and honored — a legal requirement in most jurisdictions, and hiding it raises complaint rates, which is worse than the unsubscribe
