@@ -1,0 +1,151 @@
+{
+  "skill_name": "ppc-analytics",
+  "evals": [
+    {
+      "id": 1,
+      "prompt": "I run Facebook and Google ads for my store and my data is connected to Coupler.io. Can you give me my weekly PPC review? My weekly budget is $5,000 and my target CPA is $40.",
+      "expected_output": "A weekly PPC review computed via get-data SQL covering the six blocks: spend vs the $5,000 budget pacing, CPA/ROAS vs the $40 target, top and bottom ads by efficiency, audience breakdown where available, frequency/fatigue check, and landing-page conversion rate — per platform, with dataset selection confirmed first and data freshness stated.",
+      "files": [],
+      "assertions": [
+        {
+          "id": "a1-1",
+          "text": "Discovers ad datasets via search-datasets or list-datasets and confirms the selection with the user before analyzing",
+          "type": "interaction",
+          "check": "transcript shows dataset discovery and the response presents the selected datasets with reasoning and asks for confirmation before running the full analysis"
+        },
+        {
+          "id": "a1-2",
+          "text": "Computes every reported metric via get-data SQL — no in-context arithmetic",
+          "type": "tool_usage",
+          "check": "transcript contains get-data SQL calls for the reported metrics (SUM/NULLIF aggregation shapes); no reported number lacks a corresponding query"
+        },
+        {
+          "id": "a1-3",
+          "text": "Covers spend-vs-budget pacing and CPA/ROAS vs the stated targets with specific numbers",
+          "type": "output_content",
+          "check": "output compares actual spend against the $5,000 budget with a pacing statement and actual CPA against the $40 target with the gap quantified"
+        },
+        {
+          "id": "a1-4",
+          "text": "Includes a frequency/ad-fatigue check and top/bottom ads ranked by efficiency, not spend",
+          "type": "output_content",
+          "check": "output contains a frequency or fatigue observation (or states the column is unavailable) and best/worst ads ranked by CPA or ROAS"
+        },
+        {
+          "id": "a1-5",
+          "text": "No raw column identifiers or SQL leakage in user-facing text; abbreviations defined on first use",
+          "type": "output_quality",
+          "check": "final output contains no col_0/col_1-style identifiers, and the first use of CPA/ROAS/CTR/CPM includes a plain-language definition"
+        }
+      ]
+    },
+    {
+      "id": 2,
+      "prompt": "How many total conversions did I get last month across Facebook and Google combined? Just give me the one number.",
+      "expected_output": "The skill refuses to present a naive cross-platform sum even though the user asked for one number: it reports Facebook and Google conversions separately (labeled platform-reported/attribution-inflated), explains that platform attribution double-counts, offers a GA4 comparison if connected, and offers blended CAC from an independent conversion source instead.",
+      "files": [],
+      "assertions": [
+        {
+          "id": "a2-1",
+          "text": "ATTRIBUTION CAVEAT FIRES: the response never presents a single summed FB+Google conversion figure as the answer",
+          "type": "output_quality",
+          "check": "no user-facing sentence presents Facebook + Google conversions added into one total without the double-counting caveat; the caveat about platform attribution inflation / double-counting is explicitly present"
+        },
+        {
+          "id": "a2-2",
+          "text": "Reports per-platform conversion numbers side by side, each computed via its own get-data SQL query",
+          "type": "tool_usage",
+          "check": "transcript contains separate get-data SQL aggregations per platform (or a grouped-by-platform query), and the output shows per-platform numbers"
+        },
+        {
+          "id": "a2-3",
+          "text": "Offers the GA4 (or independent-source) comparison and the blended-CAC alternative",
+          "type": "output_content",
+          "check": "output offers to compare platform-reported conversions against GA4 or another independent source, and mentions blended CAC (total spend / deduplicated conversions) as the correct combined view"
+        },
+        {
+          "id": "a2-4",
+          "text": "Handles the pushy 'just one number' framing without capitulating",
+          "type": "interaction",
+          "check": "response acknowledges the user's ask for a single number and explains in one or two sentences why a per-platform view (or an independent-source blend) is the honest answer"
+        }
+      ]
+    },
+    {
+      "id": 3,
+      "prompt": "I manage ad accounts for several clients. For this client, which platform is performing better — Meta or Google Ads — and where should I move budget? Data is in Coupler.io.",
+      "expected_output": "An efficiency-first platform comparison: Meta is normalized to Facebook Ads, a comparison matrix ranks platforms on CPA/ROAS (never raw spend), a per-platform funnel trace shows where each platform loses users, and the budget recommendation cites efficiency plus a sample-size and attribution caveat.",
+      "files": [],
+      "assertions": [
+        {
+          "id": "a3-1",
+          "text": "Normalizes the naming variant: 'Meta' is treated as Facebook Ads and not split or missed",
+          "type": "output_content",
+          "check": "output treats Meta and Facebook Ads as one platform (no duplicate Meta and Facebook rows in the comparison)"
+        },
+        {
+          "id": "a3-2",
+          "text": "Builds a comparison matrix ranked on efficiency (CPA/ROAS/CPC/CPM), never on raw spend or volume",
+          "type": "output_content",
+          "check": "output contains a platform comparison table/matrix and the recommendation ranks by an efficiency ratio, not by which platform spent or converted more in absolute terms"
+        },
+        {
+          "id": "a3-3",
+          "text": "Traces the funnel per platform, never pre-blended",
+          "type": "output_content",
+          "check": "output shows impressions-to-clicks-to-conversions per platform separately and does not present a merged cross-platform funnel"
+        },
+        {
+          "id": "a3-4",
+          "text": "Computes the comparison metrics via get-data SQL per platform",
+          "type": "tool_usage",
+          "check": "transcript contains get-data SQL calls producing per-platform aggregates used in the matrix"
+        },
+        {
+          "id": "a3-5",
+          "text": "Budget recommendation carries the attribution and sample-size limitations",
+          "type": "output_content",
+          "check": "recommendation includes at least one caveat (platform attribution differences or small conversion sample) before advising a budget move"
+        }
+      ]
+    },
+    {
+      "id": 4,
+      "prompt": "My cost per acquisition on Facebook suddenly got a lot worse this month. Why? My data is in Coupler.io.",
+      "expected_output": "A CPA-spike investigation: quantifies the spike vs a prior baseline via SQL, decomposes CPA into spend and conversion movement, checks frequency/fatigue and landing-page conversion rate as causes, checks data-quality explanations (conversion lag, partial period), and proposes specific next steps.",
+      "files": [],
+      "assertions": [
+        {
+          "id": "a4-1",
+          "text": "Quantifies the CPA change against a baseline period with specific numbers via SQL",
+          "type": "tool_usage",
+          "check": "transcript contains get-data SQL for both the current and a baseline period, and the output states both CPA values and the change"
+        },
+        {
+          "id": "a4-2",
+          "text": "Decomposes the spike: did spend rise, conversions fall, or both",
+          "type": "output_content",
+          "check": "output separates the spend movement from the conversion movement rather than reporting only the ratio"
+        },
+        {
+          "id": "a4-3",
+          "text": "Checks fatigue (frequency/CTR) and landing-page conversion rate as candidate causes",
+          "type": "output_content",
+          "check": "output examines frequency or CTR trend and clicks-to-conversion rate (or states those columns are unavailable) before concluding"
+        },
+        {
+          "id": "a4-4",
+          "text": "Rules out data artifacts before behavioral explanations",
+          "type": "output_content",
+          "check": "output mentions conversion lag / retroactive restating or partial-period effects as a possible explanation checked"
+        },
+        {
+          "id": "a4-5",
+          "text": "Asks for or confirms scope before the deep write-up",
+          "type": "interaction",
+          "check": "response confirms which dataset/campaigns and time window to investigate before presenting the full analysis"
+        }
+      ]
+    }
+  ]
+}
